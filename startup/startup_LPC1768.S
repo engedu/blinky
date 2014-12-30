@@ -83,67 +83,6 @@
 				.text										@ /* Put everything in the text-section from now on... */
 				.align										@ /* Make sure address is aligned for code output */
 
-				.macro				FUNCTION name			@ /* this macro makes life less tedious. =) */
-				.func				\name,\name				@ /* this tells a debugger that the function starts here */
-				.type				\name,%function			@ /* when a function is pointed to from a table, this is mandatory */
-				.thumb_func									@ /* when a function is called by using 'bx' or 'blx' this is mandatory */
-				.align										@ /* make sure the address is aligned for code output */
-\name\():													@ /* this defines the label. the \() is necessary to separate the colon from the label */
-				.endm
-
-				.macro				ENDFUNC name			@ /* FUNCTION and ENDFUNC must always be paired */
-				.size				\name, . - \name		@ /* tells the linker how big the code block for the function is */
-				.pool										@ /* let the assembler place constants here */
-				.endfunc									@ /* mark the end of the function, so a debugger can display it better */
-				.endm
-				.text										@ /* switch to text section, so code will be placed there. */
-
-				FUNCTION			defaultResetHandler
-				ldr					r0,=LowLevelInit		@ /* get the address of the LowLevelInit routine */
-				cmp					r0,#0					@ /* is it NULL ? */
-				it					ne
-				blxne				r0						@ /* if not, call the routine. */
-
-				ldr					r0,=SystemInit			@ /* get the address of the SystemInit routine */
-				cmp					r0,#0					@ /* is it NULL ? */
-				it					ne
-				blxne				r0						@ /* if not, call the routine. */
-
-@				/* copy the .data section from Flash memory to SRAM (this allows us to pre-initialize variables) */
-				ldr					r1,=_sidata				@ /* point our source register to the start of the .data section */
-				ldr					r2,=_sdata				@ /* point our destination register to the SRAM dedicated to our writable data */
-				ldr					r3,=_edata				@ /* point r3 after the last byte we will be writing */
-				bl					copy					@ /* call a subroutine that copies the memory block */
-
-@				/* copy code from Flash memory to SRAM. Code executes faster in SRAM than in Flash memory. */
-				ldr					r1,=_sifastcode			@ /* source address */
-				ldr					r2,=_sfastcode			@ /* destination start */
-				ldr					r3,=_efastcode			@ /* destination end */
-				bl					copy					@ /* copy code */
-
-@				/* Now zero the .bss section. This is a section of memory, which is dedicated to our varaibles. */
-@				movs				r0,#0					@ /* zero r0 */
-@				ldr					r1,=_sbss				@ /* point r1 to BSS starting address (in SRAM) */
-@				ldr					r2,=_ebss				@ /* point r2 to BSS ending address (in SRAM) */
-1:				cmp					r1,r2					@ /* check if end is reached */
-@				strlo				r0,[r1],#4				@ /* if end not reached, store zero and advance pointer */
-@				blo					1b						@ /* if end not reached, branch back to loop */
-				ldr					r0,=main				@ /* get the address of the C 'main' code */
-				blx					r0						@ /* jump to code */
-				b					defaultExceptionHandler	@ /* if we ever get here, we'll continue into an infinite loop for safety reasons */
-@
-copy:			cmp					r2,r3					@ /* check if we've reached the end */
-@				ldrlo				r0,[r1],#4				@ /* if end not reached, get word and advance source pointer */
-@				strlo				r0,[r2],#4				@ /* if end not reached, store word and advance destination pointer */
-				blo					copy					@ /* if end not reached, branch back to loop */
-				bx					lr						@ /* return to caller */
-				ENDFUNC				defaultResetHandler
-
-				FUNCTION			defaultExceptionHandler
-				wfi											@ /* wait for an interrupt, in order to save power */
-				b					defaultExceptionHandler	@/* go round loop */
-				ENDFUNC				defaultExceptionHandler
-
 
 
 _stack:

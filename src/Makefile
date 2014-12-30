@@ -47,8 +47,8 @@ CFLAGS=$(USE_NANO) $(USE_SEMIHOST) $(ARCH_FLAGS) $(STARTUP_DEFS) $(GC) $(MAP) -s
 MAP=-Wl,-Map=blinky.map
 
 # LFLAGS
-#LFLAGS=$(USE_NANO) $(USE_SEMIHOST) $(LDSCRIPTS) $(GC) $(MAP)
-LFLAGS=$(LDSCRIPTS) 
+LFLAGS=$(USE_NANO) $(USE_SEMIHOST) $(LDSCRIPTS) $(GC) $(MAP)
+#LFLAGS=$(LDSCRIPTS) 
 
 # Linker
 LDSCRIPTS=-L ../ldscripts -T lpc1768.ld
@@ -57,11 +57,11 @@ LDSCRIPTS=-L ../ldscripts -T lpc1768.ld
 blinky.o:
 	$(CC) -c $(CFLAGS) -g blinky.c -o $@
 
-startup.o: blinky.o system_LPC17xx.o
+startup.o:
 	$(CC) -c $(CFLAGS) -g $(STARTUP) -o $@
 
 funtions.o:
-	$(CC) -c $(CFLAGS) -g LPC1768Function.cc -o $@
+	$(CC) -c $(CFLAGS) -g LPC1768Function.c -o $@
 
 debug_frmwrk.o:
 	$(CC) -c $(CFLAGS) -g ../NXP/Drivers/source/debug_frmwrk.c -o $@
@@ -87,12 +87,13 @@ lpc17xx_clkpwr.o:
 lpc17xx_pinsel.o:        
 	$(CC) -c $(CFLAGS) -g ../NXP/Drivers/source/lpc17xx_pinsel.c -o $@
 
-all: lpc17xx_pinsel.o lpc17xx_clkpwr.o lpc17xx_libcfg_default.o lpc17xx_exti.o system_LPC17xx.o core_cm3.o lpc17xx_uart.o debug_frmwrk.o blinky.o startup.o funtions.o 
-	$(CC) $(LFLAGS) lpc17xx_pinsel.o lpc17xx_clkpwr.o lpc17xx_libcfg_default.o lpc17xx_exti.o system_LPC17xx.o core_cm3.o lpc17xx_uart.o debug_frmwrk.o blinky.o funtions.o startup.o -o main.elf
-	arm-none-eabi-objcopy -O binary main.elf main.bin
+all: lpc17xx_pinsel.o lpc17xx_clkpwr.o lpc17xx_libcfg_default.o lpc17xx_exti.o system_LPC17xx.o lpc17xx_uart.o debug_frmwrk.o blinky.o startup.o funtions.o 
+	$(CC) $(LFLAGS) lpc17xx_pinsel.o lpc17xx_clkpwr.o lpc17xx_libcfg_default.o lpc17xx_exti.o system_LPC17xx.o lpc17xx_uart.o debug_frmwrk.o blinky.o funtions.o startup.o -o main.elf
+	$(CP) -O binary main.elf main.bin
 	../ext/checksum main.bin
 
 clean:
 	rm -f *.o
 	rm -f *.elf
 	rm -f *.bin
+	rm -r *.map

@@ -173,35 +173,6 @@ void init_LCD(void) {
 
 void init_RTC(void) {
 
-	RTC_TIME_Type time;
-
-	// Saturday, 03.05.2014 14:26:30 (day 62/year, day 6/week, day 3/month)
-
-	time.SEC 	= 00;
-	time.MIN 	= 15;
-	time.HOUR	= 17;
-	time.DOM	= 16;
-	time.DOW	= 5;
-	time.DOY	= 136;
-	time.MONTH = 5;
-	time.YEAR	= 2014;
-
-	RTC_Init(LPC_RTC);
-
-	NVIC_DisableIRQ(RTC_IRQn);
-	NVIC_SetPriority(RTC_IRQn, ((0x01<<3)|0x01));
-
-
-	RTC_Cmd(LPC_RTC, ENABLE);
-
-	// set date after power cycle (without RTC-battery)
-	//RTC_SetFullTime (LPC_RTC, &time);
-
-
-	//RTC_CntIncrIntConfig (LPC_RTC, RTC_TIMETYPE_SECOND, ENABLE);
-	//RTC_AlarmIntConfig (LPC_RTC, RTC_TIMETYPE_SECOND, ENABLE);
-
-	NVIC_EnableIRQ (RTC_IRQn);
 
 }
 
@@ -213,7 +184,6 @@ void init_RTC(void) {
 
 void getRTCTime(RTC_TIME_Type* time) {
 
-	RTC_GetFullTime (LPC_RTC, time);
 }
 
 

@@ -16,8 +16,6 @@
 #define LPC1768FUNCTION_H_
 
 
-#include "Date.h"
-
 
 /**  @file */
 
@@ -25,25 +23,11 @@
 const unsigned long led_mask[] = { 1UL<<0, 1UL<<1, 1UL<<2, 1UL<< 3,
                                    1UL<< 4, 1UL<< 5, 1UL<< 6, 1UL<< 7 };
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "NXP/Core/CM3/DeviceSupport/NXP/LPC17xx/LPC17xx.h"
-#include "NXP/Drivers/include/lpc17xx_pinsel.h"
-#include "NXP/Drivers/include/lpc17xx_exti.h"
-#include "NXP/Drivers/include/lpc17xx_rtc.h"
-#include "NXP/Drivers/include/debug_frmwrk.h"
-
-
-#ifdef __cplusplus
-}
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "LPC17xx.h"
+#include "lpc17xx_pinsel.h"
+#include "lpc17xx_exti.h"
+#include "lpc17xx_rtc.h"
+#include "debug_frmwrk.h"
 
 
 extern int counter;
@@ -81,12 +65,6 @@ void init_RTC(void);
 void getRTCTime(RTC_TIME_Type* time);
 
 void printDebugInt(int64_t value);
-
-//void RTC_IRQHandler(void);
-
-#ifdef __cplusplus
-}
-#endif
 
 
 #endif
